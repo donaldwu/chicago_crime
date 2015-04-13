@@ -5,34 +5,63 @@ import sys
 import math
 import random
 import subprocess
+import plotly.plotly as py
+from plotly.graph_objs import *
+import csv
  
 
 PLOTLY_USERNAME = "donaldwu"  
 PLOTLY_KEY = "rwgxti48dj"
  
-if PLOTLY_USERNAME:
-    from plotly import plotly
+
  
 def main():
-    
-    #import the points here? 
-    num_points = 10 #number of points we'll test
+
+    points = [] 
+    crime_counter = 0
+    with open('crimes_since_2009.csv', 'rb') as csvfile:
+        crimereader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in crimereader:
+            print row
+            try:
+                float_long = float(row[1])
+                float_lat = float(row[2])
+                p = makePoint(float_long,float_lat) ### this is not converting all to float...
+                points.append(p)
+                crime_counter = crime_counter + 1
+            except ValueError,e:
+                print "error"
+            
+            
+            '''
+            first word = name of the crime
+            second word = x coordinate of the crime
+            third word = y coordinate of the crime 
+            i need to add a point with (x,y) createnewpoint(coords), coords [x,y]
+            append point to the points 
+            '''
+                
+            
+            if crime_counter > 100:
+                break
+    #print points 
+              
+    num_points = 100
     dimensions = 2
     
-    # Bounds for the values of those points in each dimension
     lower = (-100) # the smallest value in the dataset,41.644667993 and -87.524674931 on the lower
     upper = 100 # highest value in the dataset, 42.022787226 and -87.934324986 upper 
 
-    num_clusters = 3 #figure this out later 
+    num_clusters = 3 
     
     # When do we say the optimization has 'converged' and stop updating clusters
     opt_cutoff = 0.5
     
     # Generate some points
-    points = [makeRandomPoint(dimensions, lower, upper) for i in xrange(num_points)] #substitute for random pt
+    #points = [makeRandomPoint(dimensions, lower, upper) for i in xrange(num_points)] #replace with real data
     
     # Cluster those data!
-    clusters = kmeans(points, num_clusters, opt_cutoff)
+    clusters = kmeans(points, num_clusters, opt_cutoff) 
  
     # Print our clusters
     for i,c in enumerate(clusters):
@@ -105,13 +134,13 @@ class Cluster:
         '''
         Finds a virtual center point for a group of n-dimensional points
         '''
-        numPoints = len(self.points)
+        num_Points = len(self.points)
         # Get a list of all coordinates in this cluster
         coords = [p.coords for p in self.points]
         # Reformat that so all x's are together, all y'z etc.
         unzipped = zip(*coords)
         # Calculate the mean for each dimension
-        centroid_coords = [math.fsum(dList)/numPoints for dList in unzipped]
+        centroid_coords = [math.fsum(dList)/num_Points for dList in unzipped]
         
         return Point(centroid_coords)
  
@@ -124,14 +153,14 @@ def kmeans(points, k, cutoff):
     clusters = [Cluster([p]) for p in initial]
     
     # Loop through the dataset until the clusters stabilize
-    loopCounter = 0
+    loop_Counter = 0
     while True:
         # Create a list of lists to hold the points in each cluster
         lists = [ [] for c in clusters]
-        clusterCount = len(clusters)
+        cluster_Count = len(clusters)
         
         # Start counting loops
-        loopCounter += 1
+        loop_Counter += 1
         # For every point in the dataset ...
         for p in points:
             # Get the distance between that point and the centroid of the first
@@ -142,7 +171,7 @@ def kmeans(points, k, cutoff):
             clusterIndex = 0
         
             # For the remainder of the clusters ...
-            for i in range(clusterCount - 1):
+            for i in range(cluster_Count - 1):
                 # calculate the distance of that point to each other cluster's
                 # centroid.
                 distance = getDistance(p, clusters[i+1].centroid)
@@ -158,7 +187,7 @@ def kmeans(points, k, cutoff):
         biggest_shift = 0.0
         
         # As many times as there are clusters ...
-        for i in range(clusterCount):
+        for i in range(cluster_Count):
             # Calculate how far the centroid moved in this iteration
             shift = clusters[i].update(lists[i])
             # Keep track of the largest move from all cluster centroid updates
@@ -166,7 +195,7 @@ def kmeans(points, k, cutoff):
         
         # If the centroids have stopped moving much, say we're done!
         if biggest_shift < cutoff:
-            print "Converged after %s iterations" % loopCounter
+            print "Converged after %s iterations" % loop_Counter
             break
     return clusters
  
@@ -187,6 +216,11 @@ def makeRandomPoint(n, lower, upper):
     upper in each of those dimensions
     '''
     p = Point([random.uniform(lower, upper) for i in range(n)])
+    return p
+
+def makePoint(lower, upper):
+    cord = [lower,upper]
+    p = Point(cord)
     return p
  
 def plotClusters(data):
@@ -224,7 +258,7 @@ def plotClusters(data):
         traceList.append(centroid)
     
     # Log in to plotly
-    py = plotly.plotly(username=PLOTLY_USERNAME, key=PLOTLY_KEY)
+    py.sign_in('donaldwu','rwgxti48dj')
  
     # Style the chart
     datastyle = {'mode':'markers',
@@ -234,7 +268,7 @@ def plotClusters(data):
                        'opacity':0.6,
                        'color':'rgb(74, 134, 232)'}}
     
-    resp = py.plot(*traceList, style = datastyle)
+    resp = py.plot(traceList, style = datastyle)
     
     # Display that plot in a browser
     cmd = "open " + resp['url']
