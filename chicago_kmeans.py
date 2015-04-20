@@ -1,6 +1,3 @@
-#############################################################################
-# Full Imports
- 
 import sys
 import math
 import random
@@ -12,8 +9,6 @@ import csv
 
 PLOTLY_USERNAME = "donaldwu"  
 PLOTLY_KEY = "rwgxti48dj"
- 
-
  
 def main():
 
@@ -31,74 +26,42 @@ def main():
                 crime_counter = crime_counter + 1
             except ValueError,e:
                 print "error"
-            
-            
-            '''
-            first word = name of the crime
-            second word = x coordinate of the crime
-            third word = y coordinate of the crime 
-            i need to add a point with (x,y) createnewpoint(coords), coords [x,y]
-            append point to the points 
-            '''
-                
-            
-            if crime_counter > 100:
+            if crime_counter > 10000:
                 break
-    #print points 
-              
     num_points = 100
     dimensions = 2
     
-    lower = (-100) # the smallest value in the dataset,41.644667993 and -87.524674931 on the lower
-    upper = 100 # highest value in the dataset, 42.022787226 and -87.934324986 upper 
+    lower = (-100) 
+    upper = 100 
 
-    num_clusters = 3 
+    num_clusters = 100
     
-    # When do we say the optimization has 'converged' and stop updating clusters
     opt_cutoff = 0.5
     
     # Generate some points
     #points = [makeRandomPoint(dimensions, lower, upper) for i in xrange(num_points)] #replace with real data
-    
-    # Cluster those data!
     clusters = kmeans(points, num_clusters, opt_cutoff) 
  
-    # Print our clusters
     for i,c in enumerate(clusters):
         for p in c.points:
             print " Cluster: ", i, "\t Point :", p
-    
-    # Display clusters using plotly for 2d data
-    # This uses the 'open' command on a URL and may only work on OSX.
+
     if dimensions == 2 and PLOTLY_USERNAME:
         print "Plotting points, launching browser ..."
         plotClusters(clusters)
  
 class Point:
-    '''
-    An point in n dimensional space
-    '''
+
     def __init__(self, coords):
-        '''
-        coords - A list of values, one per dimension
-        '''
-        
         self.coords = coords
-        self.n = len(coords)
-        
+        self.n = len(coords)  
+
     def __repr__(self):
         return str(self.coords)
  
 class Cluster:
-    '''
-    A set of points and their centroid
-    '''
-    
     def __init__(self, points):
-        '''
-        points - A list of point objects
-        '''
-        
+
         if len(points) == 0: raise Exception("ILLEGAL: empty cluster")
         # The points that belong to this cluster
         self.points = points
@@ -204,6 +167,7 @@ def getDistance(a, b):
     Euclidean distance between two n-dimensional points.
     Note: This can be very slow and does not scale well
     '''
+
     if a.n != b.n:
         raise Exception("ILLEGAL: non comparable points")
     
@@ -222,7 +186,7 @@ def makePoint(lower, upper):
     cord = [lower,upper]
     p = Point(cord)
     return p
- 
+
 def plotClusters(data):
     '''
     Use the plotly API to plot data from clusters.
@@ -232,7 +196,7 @@ def plotClusters(data):
     '''
     
     # List of symbols each cluster will be displayed using    
-    symbols = ['circle', 'cross', 'triangle-up', 'square']
+    #symbols = ['circle', 'cross', 'triangle-up', 'square']
  
     # Convert data into plotly format.
     traceList = []
@@ -244,7 +208,8 @@ def plotClusters(data):
         trace = {}
         trace['x'], trace['y'] = zip(*data)
         trace['marker'] = {}
-        trace['marker']['symbol'] = symbols[i]
+        #print symbols[i]
+        #trace['marker']['symbol'] = 'circle'
         trace['name'] = "Cluster " + str(i)
         traceList.append(trace)
         # Centroid (A trace of length 1)
@@ -252,7 +217,7 @@ def plotClusters(data):
         centroid['x'] = [c.centroid.coords[0]]
         centroid['y'] = [c.centroid.coords[1]]
         centroid['marker'] = {}
-        centroid['marker']['symbol'] = symbols[i]
+        #centroid['marker']['symbol'] = symbols[i]
         centroid['marker']['color'] = 'rgb(200,10,10)'
         centroid['name'] = "Centroid " + str(i)
         traceList.append(centroid)
@@ -269,9 +234,10 @@ def plotClusters(data):
                        'color':'rgb(74, 134, 232)'}}
     
     resp = py.plot(traceList, style = datastyle)
-    
+    print resp 
+
     # Display that plot in a browser
-    cmd = "open " + resp['url']
+    cmd = "open " + resp#['url']
     subprocess.call(cmd, shell=True)
  
 if __name__ == "__main__": 
