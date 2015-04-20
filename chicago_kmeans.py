@@ -34,7 +34,7 @@ def main():
     lower = (-100) 
     upper = 100 
 
-    num_clusters = 100
+    num_clusters = 55
     
     opt_cutoff = 0.5
     
@@ -187,13 +187,32 @@ def makePoint(lower, upper):
     p = Point(cord)
     return p
 
-def plotClusters(data):
-    '''
+def plotClusters(clusters):
+    count = 0
+    data = []
+    for cluster in clusters:
+        count += 1
+        x_values = []
+        y_values = []
+        print cluster
+        print cluster[0]
+        x_values.append(point[0])
+        y_values.append(point[1])
+        data.append(Scatter(
+            x=x_values,
+            y=y_values,
+            mode='markers',
+            name='Class ' + str(count)
+        ))
+    unique_url = py.plot(Data(data)) #filename = 'k-means')
+
+'''def plotClusters(data):
+    
     Use the plotly API to plot data from clusters.
     
     Gets a plot URL from plotly and then uses subprocess to 'open' that URL
     from the command line. This should open your default web browser.
-    '''
+    
     
     # List of symbols each cluster will be displayed using    
     #symbols = ['circle', 'cross', 'triangle-up', 'square']
@@ -238,7 +257,7 @@ def plotClusters(data):
 
     # Display that plot in a browser
     cmd = "open " + resp#['url']
-    subprocess.call(cmd, shell=True)
+    subprocess.call(cmd, shell=True)'''
  
 if __name__ == "__main__": 
     main()
