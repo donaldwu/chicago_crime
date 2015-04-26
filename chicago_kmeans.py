@@ -28,13 +28,13 @@ def main():
                 print "error"
             if crime_counter > 10000:
                 break
-    num_points = 100
+    num_points = 10000
     dimensions = 2
     
     lower = (-100) 
     upper = 100 
 
-    num_clusters = 55
+    num_clusters = 99
     
     opt_cutoff = 0.5
     
@@ -187,7 +187,7 @@ def makePoint(lower, upper):
     p = Point(cord)
     return p
 
-def plotClusters(clusters):
+''''def plotClusters(clusters):
     count = 0
     data = []
     for cluster in clusters:
@@ -204,14 +204,14 @@ def plotClusters(clusters):
             mode='markers',
             name='Class ' + str(count)
         ))
-    unique_url = py.plot(Data(data)) #filename = 'k-means')
+    unique_url = py.plot(Data(data)) #filename = 'k-means')'''
 
-'''def plotClusters(data):
+def plotClusters(data):
     
-    Use the plotly API to plot data from clusters.
+    ''''Use the plotly API to plot data from clusters.
     
     Gets a plot URL from plotly and then uses subprocess to 'open' that URL
-    from the command line. This should open your default web browser.
+    from the command line. This should open your default web browser.'''
     
     
     # List of symbols each cluster will be displayed using    
@@ -257,7 +257,7 @@ def plotClusters(clusters):
 
     # Display that plot in a browser
     cmd = "open " + resp#['url']
-    subprocess.call(cmd, shell=True)'''
+    subprocess.call(cmd, shell=True)
  
 if __name__ == "__main__": 
     main()
